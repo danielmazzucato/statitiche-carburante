@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS auto (
     modello VARCHAR(100) NOT NULL,
     targa VARCHAR(50) UNIQUE NOT NULL,
     consumo_medio DECIMAL(5,2) DEFAULT NULL, -- espresso in km/l (es. 15.5)
-    documenti BYTEA DEFAULT NULL,
+    documenti TEXT DEFAULT NULL,
     FOREIGN KEY (utente_id) REFERENCES utenti(id) ON DELETE CASCADE
 );
 
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS inserimenti_utente (
     consumo_medio DECIMAL(5,2) NOT NULL,
     data_inserimento TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     km INT NOT NULL,
-    foto_path BYTEA DEFAULT NULL,
+    foto_path TEXT DEFAULT NULL,
     FOREIGN KEY (utente_id) REFERENCES utenti(id) ON DELETE CASCADE
 );
 
