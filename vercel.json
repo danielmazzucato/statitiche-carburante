@@ -1,0 +1,30 @@
+{
+  "functions": {
+    "api/*.php": {
+      "runtime": "vercel-php@0.7.2"
+    }
+  },
+  "routes": [
+    { "src": "/style.css", "dest": "/style.css" },
+    { "src": "/app.js", "dest": "/app.js" },
+    { "src": "/favicon.png", "dest": "/favicon.png" },
+    { "src": "/logo.jpg", "dest": "/logo.jpg" },
+    { "src": "/uploads/(.*)", "dest": "/uploads/$1" },
+    { "src": "/login", "dest": "/api/login.php" },
+    { "src": "/logout", "dest": "/api/logout.php" },
+    { "src": "/admin", "dest": "/api/admin.php" },
+    { "src": "/agente", "dest": "/api/agente.php" },
+    { "src": "/(.*)\\.php", "dest": "/api/$1.php" },
+    { "src": "/", "dest": "/api/index.php" }
+  ],
+  "env": {
+    "SUPABASE_URL": "@supabase_url",
+    "SUPABASE_ANON_KEY": "@supabase_anon_key",
+    "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key",
+    "DB_HOST": "@db_host",
+    "DB_PORT": "@db_port",
+    "DB_NAME": "@db_name",
+    "DB_USER": "@db_user",
+    "DB_PASS": "@db_pass"
+  }
+}
