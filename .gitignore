@@ -1,0 +1,41 @@
+# ==============================================
+# .gitignore - Statistiche Carburante
+# ==============================================
+
+# Variabili d'ambiente e credenziali
+.env
+.env.local
+.env.*.local
+
+# Upload degli utenti
+uploads/
+
+# File di sistema
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE e editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Log
+*.log
+error_log
+
+# Dipendenze
+vendor/
+node_modules/
+
+# File temporanei
+*.tmp
+*.bak
+*.cache
+
+# File scratch/test
+scratch/
