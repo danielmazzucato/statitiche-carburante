@@ -1073,6 +1073,14 @@ body {
         text-align: center;
     }
 
+    .mpm-title-group {
+        align-items: center;
+    }
+
+    .mpm-subtitle-wrap {
+        justify-content: center;
+    }
+
     .mpm-subtitle {
         font-size: 12px;
     }
