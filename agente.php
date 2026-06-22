@@ -69,12 +69,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $ext = ($mime_type === 'image/png') ? 'png' : (($mime_type === 'image/webp') ? 'webp' : 'jpg');
                         }
                         $filename = 'odometer_' . $user['id'] . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-                        $dest = __DIR__ . '/uploads/' . $filename;
+                        $uploads_dir = __DIR__ . '/uploads';
+                        if (!is_dir($uploads_dir)) {
+                            mkdir($uploads_dir, 0777, true);
+                        }
+                        chmod($uploads_dir, 0777);
+                        $dest = $uploads_dir . '/' . $filename;
                         
                         if (move_uploaded_file($file['tmp_name'], $dest)) {
                             $foto_path = 'uploads/' . $filename;
                         } else {
-                            $error_msg = "Impossibile salvare l'immagine caricata.";
+                            $last_error = error_get_last();
+                            $error_msg = "Impossibile salvare l'immagine caricata. " . ($last_error ? "(" . $last_error['message'] . ")" : "");
                         }
                     }
                 }

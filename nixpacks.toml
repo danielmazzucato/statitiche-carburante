@@ -2,7 +2,7 @@
 nixPkgs = ["php83", "php83Extensions.pdo", "php83Extensions.pdo_pgsql", "php83Extensions.pgsql", "php83Extensions.mbstring", "php83Extensions.fileinfo", "php83Extensions.session"]
 
 [phases.install]
-cmds = ["mkdir -p /app/uploads"]
+cmds = ["mkdir -p /app/uploads", "chmod 777 /app/uploads"]
 
 [start]
 cmd = "php -S 0.0.0.0:${PORT:-8080} -t /app"
