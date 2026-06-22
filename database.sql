@@ -52,20 +52,20 @@ INSERT INTO configurazioni (chiave, valore) VALUES
 ('prezzo_carburante_stati_uniti', '0.95')
 ON CONFLICT (chiave) DO UPDATE SET valore = EXCLUDED.valore;
 
--- Inserimento utenti
+-- Inserimento utenti (password aggiornate - sicure per produzione)
 INSERT INTO utenti (id, username, password, nome_completo, ruolo, nazionalita) VALUES
-(1, 'admin', '$2y$10$rKeuA7sbP1j5UmiQ/LRphup/Wp1WJ.dqvALBftqBqhVC8Rh8oYXF.', 'Amministratore MPM', 'admin', 'italia'),
-(2, 'marco.silvestri', '$2y$10$CMcIInmPQ.mf8pDaM8x1Gu19va.Dcf4NEof6Jhx4T2nSKc75W0uY.', 'MARCO SILVESTRI', 'agente', 'italia'),
-(3, 'andrea.zanon', '$2y$10$CMcIInmPQ.mf8pDaM8x1Gu19va.Dcf4NEof6Jhx4T2nSKc75W0uY.', 'ANDREA ZANON', 'agente', 'italia'),
-(4, 'damiano.trentin', '$2y$10$CMcIInmPQ.mf8pDaM8x1Gu19va.Dcf4NEof6Jhx4T2nSKc75W0uY.', 'DAMIANO TRENTIN', 'agente', 'italia'),
-(5, 'quentin.tardy', '$2y$10$CMcIInmPQ.mf8pDaM8x1Gu19va.Dcf4NEof6Jhx4T2nSKc75W0uY.', 'QUENTIN TARDY', 'agente', 'francia'),
-(6, 'christophe.nave', '$2y$10$CMcIInmPQ.mf8pDaM8x1Gu19va.Dcf4NEof6Jhx4T2nSKc75W0uY.', 'CHRISTOPHE NAVE', 'agente', 'francia'),
-(7, 'anthony.stahl', '$2y$10$CMcIInmPQ.mf8pDaM8x1Gu19va.Dcf4NEof6Jhx4T2nSKc75W0uY.', 'ANTHONY STAHL', 'agente', 'francia'),
-(8, 'francisco.ramos', '$2y$10$CMcIInmPQ.mf8pDaM8x1Gu19va.Dcf4NEof6Jhx4T2nSKc75W0uY.', 'FRANCISCO JAVIER RAMOS', 'agente', 'spagna'),
-(9, 'pablo.martinez', '$2y$10$CMcIInmPQ.mf8pDaM8x1Gu19va.Dcf4NEof6Jhx4T2nSKc75W0uY.', 'PABLO PASCUAL MARTINEZ', 'agente', 'spagna'),
-(10, 'jesus.torres', '$2y$10$CMcIInmPQ.mf8pDaM8x1Gu19va.Dcf4NEof6Jhx4T2nSKc75W0uY.', 'JESUS TORRES', 'agente', 'spagna'),
-(11, 'javier.pando', '$2y$10$CMcIInmPQ.mf8pDaM8x1Gu19va.Dcf4NEof6Jhx4T2nSKc75W0uY.', 'JAVIER ALONSO PANDO', 'agente', 'spagna'),
-(12, 'enrique.alcantara', '$2y$10$CMcIInmPQ.mf8pDaM8x1Gu19va.Dcf4NEof6Jhx4T2nSKc75W0uY.', 'ENRIQUE ALCANTARA', 'agente', 'spagna')
+(1, 'admin', '$2y$10$3ZR8CJkudl5p41oKhoM.0uaAvvTUuoLUrH4/o4AfGSf2b/4VW8DRK', 'Amministratore MPM', 'admin', 'italia'),
+(2, 'marco.silvestri', '$2y$10$.lshj4gUXUnKYv8LMDtv7uHOq4YXNkQJiD5/cif.FN47nsqPx.jrG', 'MARCO SILVESTRI', 'agente', 'italia'),
+(3, 'andrea.zanon', '$2y$10$5NZaMvtDiPxfjnDXGBAY/ObuLSgfUAzuX10YYkIv856fYyJPTzYQi', 'ANDREA ZANON', 'agente', 'italia'),
+(4, 'damiano.trentin', '$2y$10$8/Zd5Et8yNDM1NnNCSVNY.6qiwT0lXBaOjCvAChRDUsITRAyRiJkO', 'DAMIANO TRENTIN', 'agente', 'italia'),
+(5, 'quentin.tardy', '$2y$10$T1s263QfyHGsYYoyW3wdNOidli8wRfxsBVXVnHG2YK.mFnLr/vrOe', 'QUENTIN TARDY', 'agente', 'francia'),
+(6, 'christophe.nave', '$2y$10$SGc9STo4O9MAjTIdN0Wrs.MIpqf9W2rUy3AiOeP9430NR65eyDnjK', 'CHRISTOPHE NAVE', 'agente', 'francia'),
+(7, 'anthony.stahl', '$2y$10$Gg1GHwZrplhJSqyfwUx3/ewnmGEjFH4Zu8kt6ZxAQtPHQtHCrJw3K', 'ANTHONY STAHL', 'agente', 'francia'),
+(8, 'francisco.ramos', '$2y$10$0PtgIeQy48yRHZDl1yK5Dup9nrWgd4r4uWOdH.8PLW.MoDvXGINeG', 'FRANCISCO JAVIER RAMOS', 'agente', 'spagna'),
+(9, 'pablo.martinez', '$2y$10$gcmjhRrIH5TOIk5Yt/LxS.b/wtLwLCRDSvB9.oAEW5R4w29P.1A4i', 'PABLO PASCUAL MARTINEZ', 'agente', 'spagna'),
+(10, 'jesus.torres', '$2y$10$tYbiRTCmzRSfIZyVGa94Fu4eNlin92hWu0fzhVwTmV4lHf6FsamuW', 'JESUS TORRES', 'agente', 'spagna'),
+(11, 'javier.pando', '$2y$10$RcoH622RorYLsIVl9ANgZOTa1jCucnYnRplXjGfEhL.nkavCQyDSK', 'JAVIER ALONSO PANDO', 'agente', 'spagna'),
+(12, 'enrique.alcantara', '$2y$10$hIj33rBMF7qFWUvluEMdjeW6LdRTjX3SBOIv7FGwIhFedKujBpEyW', 'ENRIQUE ALCANTARA', 'agente', 'spagna')
 ON CONFLICT (username) DO UPDATE SET 
     password = EXCLUDED.password,
     nome_completo = EXCLUDED.nome_completo,

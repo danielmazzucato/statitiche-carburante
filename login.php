@@ -14,42 +14,74 @@ if (is_logged_in()) {
 }
 
 $errore = '';
+$rate_limited = false;
+
+// Controlla se la sessione è scaduta
+if (isset($_GET['expired']) && $_GET['expired'] === '1') {
+    $errore = "La sessione è scaduta per inattività. Effettua nuovamente l'accesso.";
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
-
-    if (!empty($username) && !empty($password)) {
-        try {
-            $db = getDbConnection();
-            $stmt = $db->prepare("SELECT id, username, password, nome_completo, ruolo FROM utenti WHERE username = ?");
-            $stmt->execute([$username]);
-            $user = $stmt->fetch();
-
-            if ($user && password_verify($password, $user['password'])) {
-                // Rigenera ID sessione per sicurezza
-                session_regenerate_id(true);
-
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['nome_completo'] = $user['nome_completo'];
-                $_SESSION['ruolo'] = $user['ruolo'];
-
-                // Reindirizzamento in base al ruolo
-                if ($user['ruolo'] === 'admin') {
-                    header("Location: admin.php");
-                } else {
-                    header("Location: agente.php");
-                }
-                exit();
-            } else {
-                $errore = "Nome utente o password non validi.";
-            }
-        } catch (PDOException $e) {
-            $errore = "Errore del database: " . $e->getMessage();
-        }
+    // Verifica CSRF token
+    if (!verify_csrf_token()) {
+        $errore = "Richiesta non valida. Ricarica la pagina e riprova.";
     } else {
-        $errore = "Inserisci sia il nome utente che la password.";
+        $username = sanitize_username($_POST['username'] ?? '');
+        $password = $_POST['password'] ?? '';
+        
+        // Rate limiting: massimo 5 tentativi ogni 5 minuti per IP
+        $client_ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $rate_key = 'login_' . $client_ip;
+        
+        if (!check_rate_limit($rate_key, 5, 300)) {
+            $remaining = get_remaining_lockout_time($rate_key, 300);
+            $minuti = ceil($remaining / 60);
+            $errore = "Troppi tentativi di accesso. Riprova tra {$minuti} minuti.";
+            $rate_limited = true;
+        } elseif (!empty($username) && !empty($password)) {
+            try {
+                $db = getDbConnection();
+                $stmt = $db->prepare("SELECT id, username, password, nome_completo, ruolo FROM utenti WHERE username = ?");
+                $stmt->execute([$username]);
+                $user = $stmt->fetch();
+
+                if ($user && password_verify($password, $user['password'])) {
+                    // Login riuscito - pulisci rate limit
+                    clear_rate_limit($rate_key);
+                    
+                    // Rigenera ID sessione per sicurezza (previene session fixation)
+                    session_regenerate_id(true);
+
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['username'] = $user['username'];
+                    $_SESSION['nome_completo'] = $user['nome_completo'];
+                    $_SESSION['ruolo'] = $user['ruolo'];
+                    $_SESSION['login_fingerprint'] = create_login_fingerprint();
+                    $_SESSION['login_time'] = time();
+
+                    // Reindirizzamento in base al ruolo
+                    if ($user['ruolo'] === 'admin') {
+                        header("Location: admin.php");
+                    } else {
+                        header("Location: agente.php");
+                    }
+                    exit();
+                } else {
+                    // Login fallito - registra tentativo
+                    record_attempt($rate_key);
+                    // Messaggio generico (non rivela se l'utente esiste)
+                    $errore = "Credenziali non valide. Riprova.";
+                    // Delay anti brute-force (rallenta i bot)
+                    usleep(random_int(500000, 1500000));
+                }
+            } catch (PDOException $e) {
+                // NON esporre dettagli dell'errore DB in produzione
+                error_log('Login DB Error: ' . $e->getMessage());
+                $errore = "Errore interno del server. Riprova più tardi.";
+            }
+        } else {
+            $errore = "Inserisci sia il nome utente che la password.";
+        }
     }
 }
 ?>
@@ -110,7 +142,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 <?php endif; ?>
 
-                <form action="login.php" method="POST">
+                <form action="login.php" method="POST" autocomplete="off">
+                    <?php echo get_csrf_input(); ?>
                     <div class="form-group">
                         <label for="username">Nome Utente</label>
                         <input type="text" id="username" name="username" placeholder="Inserisci il tuo username" required autocomplete="username">

@@ -49,6 +49,10 @@ function isPasswordStrong(string $password) {
 $success_msg = $_GET['success'] ?? '';
 $error_msg = $_GET['error'] ?? '';
 
+// Sanitizzazione messaggi (previene XSS via URL)
+$success_msg = htmlspecialchars($success_msg, ENT_QUOTES, 'UTF-8');
+$error_msg = htmlspecialchars($error_msg, ENT_QUOTES, 'UTF-8');
+
 // Determinazione del Tab Attivo
 $tab = $_GET['tab'] ?? 'inserimenti';
 if (!in_array($tab, ['inserimenti', 'agenti', 'auto', 'statistiche', 'impostazioni'])) {
@@ -81,6 +85,12 @@ if ($tab === 'auto' && isset($_GET['edit'])) {
 // GESTIONE AZIONI POST (CRUD & SETTINGS)
 // =========================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verifica CSRF token per tutte le azioni POST
+    if (!verify_csrf_token()) {
+        header("Location: admin.php?tab=" . urlencode($tab) . "&error=" . urlencode("Richiesta non valida. Ricarica la pagina e riprova."));
+        exit();
+    }
+    
     $action = $_POST['action'] ?? '';
 
     // 1. Elimina Inserimento
@@ -110,8 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 2. Aggiungi Utente
     if ($action === 'add_user') {
-        $username = trim($_POST['username'] ?? '');
-        $nome_completo = trim($_POST['nome_completo'] ?? '');
+        $username = sanitize_username($_POST['username'] ?? '');
+        $nome_completo = sanitize_string($_POST['nome_completo'] ?? '');
         $password = $_POST['password'] ?? '';
         $ruolo = $_POST['ruolo'] ?? 'agente';
         $nazionalita = $_POST['nazionalita'] ?? 'italia';
@@ -160,8 +170,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 3. Modifica Utente
     if ($action === 'edit_user') {
         $user_id = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT);
-        $username = trim($_POST['username'] ?? '');
-        $nome_completo = trim($_POST['nome_completo'] ?? '');
+        $username = sanitize_username($_POST['username'] ?? '');
+        $nome_completo = sanitize_string($_POST['nome_completo'] ?? '');
         $password = $_POST['password'] ?? '';
         $ruolo = $_POST['ruolo'] ?? 'agente';
         $nazionalita = $_POST['nazionalita'] ?? 'italia';
