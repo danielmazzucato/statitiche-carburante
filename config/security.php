@@ -262,7 +262,21 @@ function setup_production_errors(): void {
 }
 
 // ============================================================
-// 7. SESSION SECURITY - Sessioni ultra-sicure
+// 7. UTILITY FUNCTIONS - Utility IP per ambienti proxy
+// ============================================================
+function get_client_ip(): string {
+    if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
+        return trim($_SERVER['HTTP_X_REAL_IP']);
+    }
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        return trim($ips[0]);
+    }
+    return $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+}
+
+// ============================================================
+// 8. SESSION SECURITY - Sessioni ultra-sicure
 // ============================================================
 function enforce_session_security(): void {
     // Rigenera session ID periodicamente (ogni 30 minuti)
@@ -276,7 +290,7 @@ function enforce_session_security(): void {
     }
     
     // Verifica che l'IP non sia cambiato (protezione session hijacking)
-    $client_ip = $_SERVER['REMOTE_ADDR'] ?? '';
+    $client_ip = get_client_ip();
     if (isset($_SESSION['bound_ip'])) {
         if ($_SESSION['bound_ip'] !== $client_ip) {
             // IP cambiato - possibile hijacking, distruggi sessione

@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_POST['password'] ?? '';
         
         // Rate limiting: massimo 5 tentativi ogni 5 minuti per IP
-        $client_ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $client_ip = get_client_ip();
         $rate_key = 'login_' . $client_ip;
         
         if (!check_rate_limit($rate_key, 5, 300)) {

@@ -16,92 +16,96 @@ $success_msg = '';
 $error_msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $km = filter_input(INPUT_POST, 'km', FILTER_VALIDATE_INT);
-    $foto_path = null;
-
-    $tipo_data = $_POST['tipo_data'] ?? 'attuale';
-    $data_personalizzata = $_POST['data_personalizzata'] ?? '';
-    
-    $data_inserimento = null;
-    if ($tipo_data === 'personalizzata' && !empty($data_personalizzata)) {
-        $date_obj = DateTime::createFromFormat('Y-m-d\TH:i', $data_personalizzata);
-        if ($date_obj) {
-            $data_inserimento = $date_obj->format('Y-m-d H:i:s');
-        } else {
-            $error_msg = "Formato data personalizzata non valido.";
-        }
+    if (!verify_csrf_token()) {
+        $error_msg = "Richiesta non valida. Ricarica la pagina e riprova.";
     } else {
-        $data_inserimento = date('Y-m-d H:i:s');
-    }
+        $km = filter_input(INPUT_POST, 'km', FILTER_VALIDATE_INT);
+        $foto_path = null;
 
-    // Controlla che i km siano validi
-    if ($km === false || $km <= 0) {
-        $error_msg = "Inserisci un numero di chilometri valido (maggiore di 0).";
-    }
-
-    // Gestione caricamento foto
-    if (empty($error_msg) && isset($_FILES['foto_contachilometri']) && $_FILES['foto_contachilometri']['error'] !== UPLOAD_ERR_NO_FILE) {
-        $file = $_FILES['foto_contachilometri'];
+        $tipo_data = $_POST['tipo_data'] ?? 'attuale';
+        $data_personalizzata = $_POST['data_personalizzata'] ?? '';
         
-        // Verifica errori di caricamento
-        if ($file['error'] !== UPLOAD_ERR_OK) {
-            $error_msg = "Errore durante il caricamento della foto.";
-        } else {
-            // Controlla il tipo MIME
-            $allowed_types = ['image/jpeg', 'image/png', 'image/webp'];
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mime_type = finfo_file($finfo, $file['tmp_name']);
-            finfo_close($finfo);
-
-            if (!in_array($mime_type, $allowed_types)) {
-                $error_msg = "Formato file non valido. Carica un'immagine JPG, PNG o WebP.";
+        $data_inserimento = null;
+        if ($tipo_data === 'personalizzata' && !empty($data_personalizzata)) {
+            $date_obj = DateTime::createFromFormat('Y-m-d\TH:i', $data_personalizzata);
+            if ($date_obj) {
+                $data_inserimento = $date_obj->format('Y-m-d H:i:s');
             } else {
-                // Dimensione massima 5MB
-                if ($file['size'] > 5 * 1024 * 1024) {
-                    $error_msg = "L'immagine è troppo grande. Dimensione massima consentita: 5MB.";
+                $error_msg = "Formato data personalizzata non valido.";
+            }
+        } else {
+            $data_inserimento = date('Y-m-d H:i:s');
+        }
+
+        // Controlla che i km siano validi
+        if ($km === false || $km <= 0) {
+            $error_msg = "Inserisci un numero di chilometri valido (maggiore di 0).";
+        }
+
+        // Gestione caricamento foto
+        if (empty($error_msg) && isset($_FILES['foto_contachilometri']) && $_FILES['foto_contachilometri']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $file = $_FILES['foto_contachilometri'];
+            
+            // Verifica errori di caricamento
+            if ($file['error'] !== UPLOAD_ERR_OK) {
+                $error_msg = "Errore durante il caricamento della foto.";
+            } else {
+                // Controlla il tipo MIME
+                $allowed_types = ['image/jpeg', 'image/png', 'image/webp'];
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime_type = finfo_file($finfo, $file['tmp_name']);
+                finfo_close($finfo);
+
+                if (!in_array($mime_type, $allowed_types)) {
+                    $error_msg = "Formato file non valido. Carica un'immagine JPG, PNG o WebP.";
                 } else {
-                    // Crea nome file unico e sposta nella cartella uploads
-                    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-                    if (empty($ext)) {
-                        $ext = ($mime_type === 'image/png') ? 'png' : (($mime_type === 'image/webp') ? 'webp' : 'jpg');
-                    }
-                    $filename = 'odometer_' . $user['id'] . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-                    $dest = __DIR__ . '/uploads/' . $filename;
-                    
-                    if (move_uploaded_file($file['tmp_name'], $dest)) {
-                        $foto_path = 'uploads/' . $filename;
+                    // Dimensione massima 5MB
+                    if ($file['size'] > 5 * 1024 * 1024) {
+                        $error_msg = "L'immagine è troppo grande. Dimensione massima consentita: 5MB.";
                     } else {
-                        $error_msg = "Impossibile salvare l'immagine caricata.";
+                        // Crea nome file unico e sposta nella cartella uploads
+                        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                        if (empty($ext)) {
+                            $ext = ($mime_type === 'image/png') ? 'png' : (($mime_type === 'image/webp') ? 'webp' : 'jpg');
+                        }
+                        $filename = 'odometer_' . $user['id'] . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+                        $dest = __DIR__ . '/uploads/' . $filename;
+                        
+                        if (move_uploaded_file($file['tmp_name'], $dest)) {
+                            $foto_path = 'uploads/' . $filename;
+                        } else {
+                            $error_msg = "Impossibile salvare l'immagine caricata.";
+                        }
                     }
                 }
             }
         }
-    }
 
-    // Salva nel database se non ci sono errori
-    if (empty($error_msg)) {
-        try {
-            $db = getDbConnection();
-            
-            // Per sicurezza, verifichiamo se l'utente ha inserito dei dati in anagrafica
-            if (empty($user['modello_auto']) || empty($user['consumo_medio'])) {
-                $error_msg = "Attenzione: non puoi inserire registrazioni perché il tuo profilo non ha ancora un modello auto o un consumo medio impostato. Contatta l'amministratore.";
-            } else {
-                $stmt = $db->prepare("INSERT INTO inserimenti_utente (utente_id, username, modello_auto, consumo_medio, km, foto_path, data_inserimento) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([
-                    $user['id'],
-                    $user['username'],
-                    $user['modello_auto'],
-                    $user['consumo_medio'],
-                    $km,
-                    $foto_path,
-                    $data_inserimento
-                ]);
+        // Salva nel database se non ci sono errori
+        if (empty($error_msg)) {
+            try {
+                $db = getDbConnection();
                 
-                $success_msg = "Registrazione effettuata con successo! I dati del viaggio sono stati memorizzati.";
+                // Per sicurezza, verifichiamo se l'utente ha inserito dei dati in anagrafica
+                if (empty($user['modello_auto']) || empty($user['consumo_medio'])) {
+                    $error_msg = "Attenzione: non puoi inserire registrazioni perché il tuo profilo non ha ancora un modello auto o un consumo medio impostato. Contatta l'amministratore.";
+                } else {
+                    $stmt = $db->prepare("INSERT INTO inserimenti_utente (utente_id, username, modello_auto, consumo_medio, km, foto_path, data_inserimento) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([
+                        $user['id'],
+                        $user['username'],
+                        $user['modello_auto'],
+                        $user['consumo_medio'],
+                        $km,
+                        $foto_path,
+                        $data_inserimento
+                    ]);
+                    
+                    $success_msg = "Registrazione effettuata con successo! I dati del viaggio sono stati memorizzati.";
+                }
+            } catch (PDOException $e) {
+                $error_msg = "Errore durante il salvataggio dei dati: " . $e->getMessage();
             }
-        } catch (PDOException $e) {
-            $error_msg = "Errore durante il salvataggio dei dati: " . $e->getMessage();
         }
     }
 }
@@ -182,6 +186,7 @@ $data_corrente = date('d/m/Y H:i');
                 <?php endif; ?>
 
                 <form action="agente.php" method="POST" enctype="multipart/form-data">
+                    <?php echo get_csrf_input(); ?>
                     <div class="form-group">
                         <label>Agente (Nome Profilo)</label>
                         <input type="text" value="<?php echo htmlspecialchars($user['nome_completo']); ?> (<?php echo htmlspecialchars($user['username']); ?>)" readonly>

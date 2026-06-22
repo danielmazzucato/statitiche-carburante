@@ -7,9 +7,10 @@ function sec_session_start() {
     if (session_status() === PHP_SESSION_NONE) {
         // Parametri per una sessione ultra-sicura
         $session_name = 'sec_session_carburante';
-        $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+        $secure = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || 
+                  (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
         $httponly = true;
-        $samesite = 'Strict'; // Più restrittivo di 'Lax'
+        $samesite = 'Lax'; // Più compatibile dietro proxy e redirect rispetto a 'Strict'
 
         // Impedisce a JavaScript di leggere la sessione
         if (ini_get('session.use_only_cookies') === '0') {
@@ -94,6 +95,6 @@ function require_role(string $role) {
 // Funzione per creare il login fingerprint (anti session hijacking)
 function create_login_fingerprint(): string {
     $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+    $ip = get_client_ip();
     return hash('sha256', $ua . $ip . 'mpm_salt_2024');
 }

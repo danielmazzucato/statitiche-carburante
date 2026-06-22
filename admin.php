@@ -710,6 +710,7 @@ try {
                                         </td>
                                         <td>
                                             <form action="admin.php?tab=inserimenti" method="POST" onsubmit="return confirm('Sei sicuro di voler eliminare definitivamente questo inserimento?');" style="display:inline;">
+                                                <?php echo get_csrf_input(); ?>
                                                 <input type="hidden" name="action" value="delete_inserimento">
                                                 <input type="hidden" name="inserimento_id" value="<?php echo $l['id']; ?>">
                                                 <button type="submit" class="btn-danger">
@@ -1026,6 +1027,7 @@ try {
                             Modifica Anagrafica Agente: <?php echo htmlspecialchars($edit_user['nome_completo']); ?>
                         </div>
                         <form action="admin.php?tab=agenti" method="POST">
+                            <?php echo get_csrf_input(); ?>
                             <input type="hidden" name="action" value="edit_user">
                             <input type="hidden" name="user_id" value="<?php echo $edit_user['id']; ?>">
 
@@ -1114,6 +1116,7 @@ try {
                                             </a>
                                             <?php if ($u['id'] !== $current_user['id']): ?>
                                                 <form action="admin.php?tab=agenti" method="POST" onsubmit="return confirm('Sei sicuro?');" style="display:inline;">
+                                                    <?php echo get_csrf_input(); ?>
                                                     <input type="hidden" name="action" value="delete_user">
                                                     <input type="hidden" name="user_id" value="<?php echo $u['id']; ?>">
                                                     <button type="submit" class="btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 8px;">
@@ -1148,6 +1151,7 @@ try {
                             Modifica Veicolo: <?php echo htmlspecialchars($edit_auto['targa']); ?>
                         </div>
                         <form action="admin.php?tab=auto" method="POST" enctype="multipart/form-data">
+                            <?php echo get_csrf_input(); ?>
                             <input type="hidden" name="action" value="edit_auto">
                             <input type="hidden" name="auto_id" value="<?php echo $edit_auto['id']; ?>">
 
@@ -1237,6 +1241,7 @@ try {
                                                 <i data-lucide="edit-2" style="width: 12px; height: 12px;"></i> Modifica
                                             </a>
                                             <form action="admin.php?tab=auto" method="POST" onsubmit="return confirm('Sei sicuro di voler eliminare questa auto?');" style="display:inline;">
+                                                <?php echo get_csrf_input(); ?>
                                                 <input type="hidden" name="action" value="delete_auto">
                                                 <input type="hidden" name="auto_id" value="<?php echo $a['id']; ?>">
                                                 <button type="submit" class="btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 8px;">
@@ -1265,6 +1270,7 @@ try {
                             <i data-lucide="user-plus" style="width: 24px; height: 24px;"></i> Crea Nuovo Agente
                         </div>
                         <form action="admin.php?tab=impostazioni" method="POST">
+                            <?php echo get_csrf_input(); ?>
                             <input type="hidden" name="action" value="add_user">
 
                             <div class="form-group">
@@ -1314,6 +1320,7 @@ try {
                             <i data-lucide="plus-circle" style="width: 24px; height: 24px;"></i> Registra Nuova Auto
                         </div>
                         <form action="admin.php?tab=impostazioni" method="POST" enctype="multipart/form-data">
+                            <?php echo get_csrf_input(); ?>
                             <input type="hidden" name="action" value="add_auto">
 
                             <div class="form-group">
@@ -1358,6 +1365,7 @@ try {
                             <i data-lucide="badge-euro" style="width: 24px; height: 24px;"></i> Prezzi Carburante Nazionali
                         </div>
                         <form action="admin.php?tab=impostazioni" method="POST">
+                            <?php echo get_csrf_input(); ?>
                             <input type="hidden" name="action" value="update_settings">
                             
                             <div class="form-group">
