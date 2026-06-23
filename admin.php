@@ -507,7 +507,7 @@ try {
 
             <div class="mpm-left-group">
                 <div class="mpm-logo-container">
-                    <img src="logo.png" alt="MPM Logo" class="mpm-logo-img">
+                    <img src="logo.jpg" alt="MPM Logo" class="mpm-logo-img">
                 </div>
 
                 <div class="mpm-title-group">

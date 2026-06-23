@@ -4,7 +4,7 @@ const STATIC_ASSETS = [
   'app.js',
   'favicon.png',
   'favicon.ico',
-  'logo.png'
+  'logo.jpg'
 ];
 
 // Install Event
