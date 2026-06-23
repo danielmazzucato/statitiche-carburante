@@ -3,6 +3,7 @@ const STATIC_ASSETS = [
   'style.css',
   'app.js',
   'favicon.png',
+  'favicon.ico',
   'logo.jpg'
 ];
 

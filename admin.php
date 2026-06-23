@@ -494,7 +494,7 @@ try {
     <meta name="theme-color" content="#0b0f19">
 
     <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
-    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <!-- Lucide Icons Library -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -507,7 +507,7 @@ try {
 
             <div class="mpm-left-group">
                 <div class="mpm-logo-container">
-                    <img src="logo.jpg" alt="MPM Logo" class="mpm-logo-img">
+                    <img src="favicon.ico" alt="MPM Logo" class="mpm-logo-img">
                 </div>
 
                 <div class="mpm-title-group">
