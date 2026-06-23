@@ -148,7 +148,7 @@ $data_corrente = date('d/m/Y H:i');
 
             <div class="mpm-left-group">
                 <div class="mpm-logo-container">
-                    <img src="favicon.ico" alt="MPM Logo" class="mpm-logo-img">
+                    <img src="logo.png" alt="MPM Logo" class="mpm-logo-img">
                 </div>
 
                 <div class="mpm-title-group">
