@@ -1161,3 +1161,72 @@ body {
         font-size: 0.8rem;
     }
 }
+
+/* =========================================
+   APP SHELL / APP-LIKE LAYOUT (Fullscreen)
+   ========================================= */
+body.app-shell {
+    height: 100dvh;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+body.app-shell .app-wrapper {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+body.app-shell .app-wrapper > header.mpm-header {
+    flex-shrink: 0;
+    margin-bottom: 1.5rem; /* Ridotto da 2.5rem per salvare spazio verticale */
+}
+
+body.app-shell .app-wrapper > .alert {
+    flex-shrink: 0;
+    margin-bottom: 1rem;
+}
+
+body.app-shell .app-wrapper > nav.admin-tabs {
+    flex-shrink: 0;
+    margin-bottom: 1.5rem;
+}
+
+body.app-shell .app-wrapper > section,
+body.app-shell .app-wrapper > main {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0; /* Consente la riduzione dell'elemento all'interno del flexbox container */
+    padding-right: 0.5rem;
+}
+
+/* Scrollbar personalizzata per le aree di scorrimento interne */
+body.app-shell .app-wrapper > section::-webkit-scrollbar,
+body.app-shell .app-wrapper > main::-webkit-scrollbar {
+    width: 8px;
+}
+
+body.app-shell .app-wrapper > section::-webkit-scrollbar-track,
+body.app-shell .app-wrapper > main::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+body.app-shell .app-wrapper > section::-webkit-scrollbar-thumb,
+body.app-shell .app-wrapper > main::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+body.app-shell .app-wrapper > section::-webkit-scrollbar-thumb:hover,
+body.app-shell .app-wrapper > main::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}

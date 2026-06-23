@@ -146,3 +146,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }).format(val);
     }
 });
+
+// =========================================
+// REGISTRAZIONE SERVICE WORKER PER PWA
+// =========================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js')
+            .then(function (registration) {
+                console.log('Service Worker registrato con successo con scope:', registration.scope);
+            })
+            .catch(function (error) {
+                console.error('Registrazione Service Worker fallita:', error);
+            });
+    });
+}
+

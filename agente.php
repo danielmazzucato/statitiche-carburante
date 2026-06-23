@@ -126,13 +126,21 @@ $data_corrente = date('d/m/Y H:i');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MPM | Area Agente - Inserimento Dati</title>
+    
+    <!-- PWA Settings -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0b0f19">
+
     <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>">
     <link rel="icon" href="favicon.png" type="image/png">
     <!-- Lucide Icons Library -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<body>
+<body class="app-shell">
     <div class="app-wrapper">
         <!-- ===== HEADER MPM ===== -->
         <header class="mpm-header animate-in">
