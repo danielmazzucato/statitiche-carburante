@@ -7,6 +7,26 @@ require_once __DIR__ . '/config/database.php';
 require_role('admin');
 
 $db = getDbConnection();
+
+// DEBUG TEMP
+$debug_file = __DIR__ . '/debug_photos.txt';
+$debug_data = "DEBUG PHOTOS AT " . date('Y-m-d H:i:s') . "\n";
+try {
+    $stmt = $db->query("SELECT id, username, foto_path FROM inserimenti_utente ORDER BY id DESC");
+    $rows = $stmt->fetchAll();
+    foreach ($rows as $r) {
+        $p = $r['foto_path'];
+        $exists = 'N/A';
+        if ($p) {
+            $exists = file_exists(__DIR__ . '/' . $p) ? 'TRUE' : 'FALSE';
+        }
+        $debug_data .= "ID: {$r['id']} | User: {$r['username']} | Path: " . ($p ? $p : '[NULL]') . " | Exists: {$exists}\n";
+    }
+} catch (Exception $e) {
+    $debug_data .= "Error: " . $e->getMessage() . "\n";
+}
+file_put_contents($debug_file, $debug_data);
+
 $current_user = get_logged_user();
 
 // Helper per formattare la data con il giorno della settimana in italiano
