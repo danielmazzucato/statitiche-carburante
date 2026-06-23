@@ -58,10 +58,7 @@ function verify_csrf_token(): bool {
     if (empty($token) || empty($_SESSION['csrf_token'])) {
         return false;
     }
-    $valid = hash_equals($_SESSION['csrf_token'], $token);
-    // Rigenera il token dopo la verifica (one-time use)
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    return $valid;
+    return hash_equals($_SESSION['csrf_token'], $token);
 }
 
 // ============================================================

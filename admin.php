@@ -243,14 +243,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                // Elimina le immagini associate agli inserimenti dell'utente da Supabase Storage
+                // Elimina le immagini associate agli inserimenti dell'utente da Supabase Storage in blocco
                 $stmt = $db->prepare("SELECT foto_path FROM inserimenti_utente WHERE utente_id = ?");
                 $stmt->execute([$user_id]);
                 $photos = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                
+                $filenames_to_delete = [];
                 foreach ($photos as $photo) {
                     if ($photo) {
-                        supabaseStorageDelete(extractStorageFilename($photo));
+                        $filenames_to_delete[] = extractStorageFilename($photo);
                     }
+                }
+                
+                if (!empty($filenames_to_delete)) {
+                    supabaseStorageDelete($filenames_to_delete);
                 }
 
                 $stmt = $db->prepare("DELETE FROM utenti WHERE id = ?");

@@ -91,3 +91,9 @@ INSERT INTO auto (utente_id, modello, targa, consumo_medio) VALUES
 ON CONFLICT (targa) DO UPDATE SET 
     modello = EXCLUDED.modello,
     consumo_medio = EXCLUDED.consumo_medio;
+
+-- Indici per ottimizzare le prestazioni delle query e delle cancellazioni (DELETE CASCADE)
+CREATE INDEX IF NOT EXISTS idx_inserimenti_utente_id ON inserimenti_utente(utente_id);
+CREATE INDEX IF NOT EXISTS idx_inserimenti_data_inserimento ON inserimenti_utente(data_inserimento);
+CREATE INDEX IF NOT EXISTS idx_auto_utente_id ON auto(utente_id);
+

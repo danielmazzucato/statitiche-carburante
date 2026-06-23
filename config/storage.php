@@ -93,34 +93,46 @@ function supabaseStorageUpload($local_path, $filename, $mime_type, $bucket = 'up
 }
 
 /**
- * Elimina un file da Supabase Storage.
+ * Elimina uno o più file da Supabase Storage.
+ * Non blocca mai l'operazione principale in caso di errore.
  *
- * @param  string $filename  Nome file remoto (solo il basename, es. "odometer_6_123.jpeg")
- * @param  string $bucket    Nome del bucket
+ * @param  string|array $filenames  Nome file o array di nomi file remoti (solo il basename, es. "odometer_6_123.jpeg")
+ * @param  string       $bucket     Nome del bucket
  * @return bool
  */
-function supabaseStorageDelete($filename, $bucket = 'uploads') {
-    if (!$filename) return false;
+function supabaseStorageDelete($filenames, $bucket = 'uploads') {
+    if (empty($filenames)) return false;
 
-    $url = SUPABASE_URL . '/storage/v1/object/' . $bucket;
+    // Converti in array se passata una singola stringa
+    $prefixes = is_array($filenames) ? $filenames : [$filenames];
+    
+    // Filtra e pulisci i nomi dei file
+    $prefixes = array_values(array_filter(array_map('trim', $prefixes)));
+    if (empty($prefixes)) return false;
 
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CUSTOMREQUEST  => 'DELETE',
-        CURLOPT_POSTFIELDS     => json_encode(['prefixes' => [$filename]]),
-        CURLOPT_HTTPHEADER     => [
-            'Authorization: Bearer ' . SUPABASE_SERVICE_ROLE_KEY,
-            'apikey: ' . SUPABASE_ANON_KEY,
-            'Content-Type: application/json',
-        ],
-        CURLOPT_TIMEOUT => 10,
-    ]);
-    $response  = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    try {
+        $url = SUPABASE_URL . '/storage/v1/object/' . $bucket;
 
-    return $http_code >= 200 && $http_code < 300;
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST  => 'DELETE',
+            CURLOPT_POSTFIELDS     => json_encode(['prefixes' => $prefixes]),
+            CURLOPT_HTTPHEADER     => [
+                'Authorization: Bearer ' . SUPABASE_SERVICE_ROLE_KEY,
+                'apikey: ' . SUPABASE_ANON_KEY,
+                'Content-Type: application/json',
+            ],
+            CURLOPT_TIMEOUT => 10,
+        ]);
+        $response  = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        return $http_code >= 200 && $http_code < 300;
+    } catch (Exception $e) {
+        return false;
+    }
 }
 
 /**
