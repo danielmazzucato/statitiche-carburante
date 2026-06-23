@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["php83", "php83Extensions.pdo", "php83Extensions.pdo_pgsql", "php83Extensions.pgsql", "php83Extensions.mbstring", "php83Extensions.fileinfo", "php83Extensions.session"]
+nixPkgs = ["php83", "php83Extensions.pdo", "php83Extensions.pdo_pgsql", "php83Extensions.pgsql", "php83Extensions.mbstring", "php83Extensions.fileinfo", "php83Extensions.session", "php83Extensions.curl"]
 
 [phases.install]
 cmds = ["mkdir -p /app/uploads", "chmod 777 /app/uploads"]

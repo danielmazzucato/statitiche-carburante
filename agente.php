@@ -2,6 +2,7 @@
 // agente.php
 require_once __DIR__ . '/config/auth.php';
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/config/storage.php';
 
 // Assicura che l'utente sia loggato come agente
 require_role('agente');
@@ -63,24 +64,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($file['size'] > 5 * 1024 * 1024) {
                         $error_msg = "L'immagine è troppo grande. Dimensione massima consentita: 5MB.";
                     } else {
-                        // Crea nome file unico e sposta nella cartella uploads
+                        // Crea nome file unico e carica su Supabase Storage
                         $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
                         if (empty($ext)) {
                             $ext = ($mime_type === 'image/png') ? 'png' : (($mime_type === 'image/webp') ? 'webp' : 'jpg');
                         }
                         $filename = 'odometer_' . $user['id'] . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-                        $uploads_dir = __DIR__ . '/uploads';
-                        if (!is_dir($uploads_dir)) {
-                            mkdir($uploads_dir, 0777, true);
-                        }
-                        chmod($uploads_dir, 0777);
-                        $dest = $uploads_dir . '/' . $filename;
-                        
-                        if (move_uploaded_file($file['tmp_name'], $dest)) {
-                            $foto_path = 'uploads/' . $filename;
+
+                        $public_url = supabaseStorageUpload($file['tmp_name'], $filename, $mime_type);
+                        if ($public_url) {
+                            $foto_path = $public_url;
                         } else {
-                            $last_error = error_get_last();
-                            $error_msg = "Impossibile salvare l'immagine caricata. " . ($last_error ? "(" . $last_error['message'] . ")" : "");
+                            $error_msg = "Impossibile caricare l'immagine. Verifica la connessione a Supabase Storage.";
                         }
                     }
                 }

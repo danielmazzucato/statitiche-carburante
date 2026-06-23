@@ -2,6 +2,7 @@
 // admin.php
 require_once __DIR__ . '/config/auth.php';
 require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/config/storage.php';
 
 // Assicura che l'utente sia loggato come admin
 require_role('admin');
@@ -98,13 +99,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $inserimento_id = filter_input(INPUT_POST, 'inserimento_id', FILTER_VALIDATE_INT);
         if ($inserimento_id) {
             try {
-                // Recupera percorso foto per eliminarla dal disco
+                // Recupera percorso foto per eliminarla da Supabase Storage
                 $stmt = $db->prepare("SELECT foto_path FROM inserimenti_utente WHERE id = ?");
                 $stmt->execute([$inserimento_id]);
                 $foto_path = $stmt->fetchColumn();
                 
-                if ($foto_path && file_exists(__DIR__ . '/' . $foto_path)) {
-                    unlink(__DIR__ . '/' . $foto_path);
+                if ($foto_path) {
+                    supabaseStorageDelete(extractStorageFilename($foto_path));
                 }
 
                 $stmt = $db->prepare("DELETE FROM inserimenti_utente WHERE id = ?");
@@ -242,13 +243,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                // Elimina le immagini associate agli inserimenti dell'utente prima di eliminare a cascata
+                // Elimina le immagini associate agli inserimenti dell'utente da Supabase Storage
                 $stmt = $db->prepare("SELECT foto_path FROM inserimenti_utente WHERE utente_id = ?");
                 $stmt->execute([$user_id]);
                 $photos = $stmt->fetchAll(PDO::FETCH_COLUMN);
                 foreach ($photos as $photo) {
-                    if ($photo && file_exists(__DIR__ . '/' . $photo)) {
-                        unlink(__DIR__ . '/' . $photo);
+                    if ($photo) {
+                        supabaseStorageDelete(extractStorageFilename($photo));
                     }
                 }
 
@@ -324,19 +325,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (isset($_FILES['documenti']) && $_FILES['documenti']['error'] === UPLOAD_ERR_OK) {
                     $file = $_FILES['documenti'];
                     $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    $doc_mime = finfo_file($finfo, $file['tmp_name']);
+                    finfo_close($finfo);
                     $filename = 'doc_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-                    $uploads_dir = __DIR__ . '/uploads';
-                    if (!is_dir($uploads_dir)) {
-                        mkdir($uploads_dir, 0777, true);
-                    }
-                    chmod($uploads_dir, 0777);
-                    $dest = $uploads_dir . '/' . $filename;
-                    if (move_uploaded_file($file['tmp_name'], $dest)) {
-                        $doc_path = 'uploads/' . $filename;
+                    $public_url = supabaseStorageUpload($file['tmp_name'], $filename, $doc_mime);
+                    if ($public_url) {
+                        $doc_path = $public_url;
                     } else {
-                        $last_error = error_get_last();
-                        $error_msg = "Impossibile salvare il documento caricato. " . ($last_error ? "(" . $last_error['message'] . ")" : "");
-                        header("Location: admin.php?tab=impostazioni&error=" . urlencode($error_msg));
+                        header("Location: admin.php?tab=impostazioni&error=" . urlencode("Impossibile caricare il documento su Supabase Storage."));
                         exit();
                     }
                 }
@@ -388,20 +385,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (isset($_FILES['documenti']) && $_FILES['documenti']['error'] === UPLOAD_ERR_OK) {
                     $file = $_FILES['documenti'];
                     $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    $doc_mime = finfo_file($finfo, $file['tmp_name']);
+                    finfo_close($finfo);
                     $filename = 'doc_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
-                    $uploads_dir = __DIR__ . '/uploads';
-                    if (!is_dir($uploads_dir)) {
-                        mkdir($uploads_dir, 0777, true);
-                    }
-                    chmod($uploads_dir, 0777);
-                    $dest = $uploads_dir . '/' . $filename;
-                    if (move_uploaded_file($file['tmp_name'], $dest)) {
-                        $doc_path = 'uploads/' . $filename;
+                    $public_url = supabaseStorageUpload($file['tmp_name'], $filename, $doc_mime);
+                    if ($public_url) {
+                        $doc_path = $public_url;
                         $update_doc = true;
                     } else {
-                        $last_error = error_get_last();
-                        $error_msg = "Impossibile salvare il documento caricato. " . ($last_error ? "(" . $last_error['message'] . ")" : "");
-                        header("Location: admin.php?tab=auto&edit=" . $auto_id . "&error=" . urlencode($error_msg));
+                        header("Location: admin.php?tab=auto&edit=" . $auto_id . "&error=" . urlencode("Impossibile caricare il documento su Supabase Storage."));
                         exit();
                     }
                 }
@@ -432,8 +425,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$auto_id]);
                 $doc_path = $stmt->fetchColumn();
                 
-                if ($doc_path && file_exists(__DIR__ . '/' . $doc_path)) {
-                    unlink(__DIR__ . '/' . $doc_path);
+                if ($doc_path) {
+                    supabaseStorageDelete(extractStorageFilename($doc_path));
                 }
 
                 $stmt = $db->prepare("DELETE FROM auto WHERE id = ?");
@@ -538,30 +531,6 @@ try {
                 </a>
             </div>
         </header>
-
-        <!-- ===== DEBUG FOTO ===== -->
-        <div style="background: #1e293b; color: #f8fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 2px solid var(--primary); font-family: monospace; font-size: 0.85rem; overflow-x: auto; z-index: 1000; position: relative;">
-            <h4 style="margin-top:0; color: var(--primary);">[DEBUG DIAGNOSTICO FOTO]</h4>
-            <?php
-            try {
-                $debug_stmt = $db->query("SELECT id, username, foto_path FROM inserimenti_utente ORDER BY id DESC LIMIT 10");
-                $debug_rows = $debug_stmt->fetchAll();
-                if (empty($debug_rows)) {
-                    echo "Nessun inserimento presente nel database.<br>";
-                }
-                foreach ($debug_rows as $dr) {
-                    $p = $dr['foto_path'];
-                    $exists = 'N/A';
-                    if ($p) {
-                        $exists = file_exists(__DIR__ . '/' . $p) ? '<b style="color:#10b981;">PRESENTE SUL DISCO DEL SERVER</b>' : '<b style="color:#ef4444;">NON TROVATO SUL DISCO DEL SERVER</b>';
-                    }
-                    echo "ID: {$dr['id']} | Utente: {$dr['username']} | Percorso DB: " . ($p ? htmlspecialchars($p) : "<i>NULL/VUOTO</i>") . " | Stato File: {$exists}<br>";
-                }
-            } catch (Exception $de) {
-                echo "Errore query di debug: " . $de->getMessage() . "<br>";
-            }
-            ?>
-        </div>
 
         <!-- ===== SEZIONE MESSAGGI ===== -->
         <?php if (!empty($success_msg)): ?>
@@ -750,7 +719,7 @@ try {
                                             <?php echo number_format($l['km'], 0, ',', '.'); ?> km
                                         </td>
                                         <td>
-                                            <?php if ($l['foto_path'] && file_exists(__DIR__ . '/' . $l['foto_path'])): ?>
+                                            <?php if ($l['foto_path']): ?>
                                                 <img src="<?php echo htmlspecialchars($l['foto_path']); ?>" 
                                                      class="img-thumbnail" 
                                                      data-full-src="<?php echo htmlspecialchars($l['foto_path']); ?>" 
