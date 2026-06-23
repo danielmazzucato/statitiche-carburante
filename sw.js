@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mpm-carburante-cache-v2';
+const CACHE_NAME = 'mpm-carburante-cache-v3';
 const STATIC_ASSETS = [
   'style.css',
   'app.js',
@@ -37,12 +37,18 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch Event - Network first for PHP/dynamic content & user uploads, Cache first for static assets
+// Fetch Event - Network first for PHP/dynamic content, Cache first for static assets. Bypass for uploads.
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   
-  // For PHP files, HTML navigation, or user uploads, always try network first
-  if (event.request.mode === 'navigate' || url.pathname.endsWith('.php') || url.pathname.includes('/uploads/')) {
+  // Esclude completamente la cartella degli upload dall'intercettazione del Service Worker.
+  // In questo modo il browser gestisce la richiesta delle foto nativamente via rete.
+  if (url.pathname.includes('/uploads/')) {
+    return;
+  }
+  
+  // For PHP files or HTML navigation, always try network first
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('.php')) {
     event.respondWith(
       fetch(event.request)
         .catch(() => {
