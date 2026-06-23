@@ -703,9 +703,9 @@ try {
                             <thead>
                                 <tr>
                                     <th>Agente</th>
-                                    <th>Username</th>
-                                    <th>Modello Auto (Storico)</th>
-                                    <th>Consumo Medio (Storico)</th>
+                                    <th class="col-hide-mobile">Username</th>
+                                    <th class="col-hide-mobile">Modello Auto (Storico)</th>
+                                    <th class="col-hide-mobile">Consumo Medio (Storico)</th>
                                     <th>Data & Ora</th>
                                     <th>Chilometri</th>
                                     <th>Foto</th>
@@ -718,9 +718,9 @@ try {
                                         <td style="font-weight: 700; color: var(--text-main);">
                                             <?php echo htmlspecialchars($l['nome_completo'] ?? 'Utente Eliminato'); ?>
                                         </td>
-                                        <td><code><?php echo htmlspecialchars($l['username']); ?></code></td>
-                                        <td><?php echo htmlspecialchars($l['modello_auto']); ?></td>
-                                        <td><?php echo number_format($l['consumo_medio'], 2, ',', '.'); ?> km/l</td>
+                                        <td class="col-hide-mobile"><code><?php echo htmlspecialchars($l['username']); ?></code></td>
+                                        <td class="col-hide-mobile"><?php echo htmlspecialchars($l['modello_auto']); ?></td>
+                                        <td class="col-hide-mobile"><?php echo number_format($l['consumo_medio'], 2, ',', '.'); ?> km/l</td>
                                         <td><?php echo date('d/m/Y H:i', strtotime($l['data_inserimento'])); ?></td>
                                         <td style="font-weight: 800; color: var(--text-main); font-size: 0.95rem;">
                                             <?php echo number_format($l['km'], 0, ',', '.'); ?> km
@@ -1115,10 +1115,10 @@ try {
                         <thead>
                             <tr>
                                 <th>Nome Completo</th>
-                                <th>Username</th>
-                                <th>Ruolo</th>
-                                <th>Nazionalità</th>
-                                <th>Data Creazione</th>
+                                <th class="col-hide-mobile">Username</th>
+                                <th class="col-hide-mobile">Ruolo</th>
+                                <th class="col-hide-mobile">Nazionalità</th>
+                                <th class="col-hide-mobile">Data Creazione</th>
                                 <th>Azioni</th>
                             </tr>
                         </thead>
@@ -1126,17 +1126,17 @@ try {
                             <?php foreach ($tutti_utenti as $u): ?>
                                 <tr style="<?php echo ($edit_user && $edit_user['id'] === $u['id']) ? 'background: rgba(255, 215, 0, 0.08);' : ''; ?>">
                                     <td style="font-weight: 700; color: var(--text-main);"><?php echo htmlspecialchars($u['nome_completo']); ?></td>
-                                    <td><code><?php echo htmlspecialchars($u['username']); ?></code></td>
-                                    <td>
+                                    <td class="col-hide-mobile"><code><?php echo htmlspecialchars($u['username']); ?></code></td>
+                                    <td class="col-hide-mobile">
                                         <span style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 20px; 
                                                      background: <?php echo $u['ruolo'] === 'admin' ? 'rgba(239, 68, 68, 0.1); color: var(--danger);' : 'var(--cat-venduto-bg); color: var(--accent-dark);'; ?>">
                                             <?php echo $u['ruolo']; ?>
                                         </span>
                                     </td>
-                                    <td style="font-weight: 600; color: var(--text-main); text-transform: capitalize;">
+                                    <td class="col-hide-mobile" style="font-weight: 600; color: var(--text-main); text-transform: capitalize;">
                                         <?php echo htmlspecialchars(str_replace('_', ' ', $u['nazionalita'])); ?>
                                     </td>
-                                    <td><?php echo date('d/m/Y', strtotime($u['creato_il'])); ?></td>
+                                    <td class="col-hide-mobile"><?php echo date('d/m/Y', strtotime($u['creato_il'])); ?></td>
                                     <td>
                                         <div style="display:flex; gap:0.5rem;">
                                             <a href="admin.php?tab=agenti&edit=<?php echo $u['id']; ?>" class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 8px;">
@@ -1239,9 +1239,9 @@ try {
                             <tr>
                                 <th>Modello</th>
                                 <th>Targa</th>
-                                <th>Consumo</th>
+                                <th class="col-hide-mobile">Consumo</th>
                                 <th>Agente Associato</th>
-                                <th>Documenti</th>
+                                <th class="col-hide-mobile">Documenti</th>
                                 <th>Azioni</th>
                             </tr>
                         </thead>
@@ -1250,11 +1250,11 @@ try {
                                 <tr style="<?php echo ($edit_auto && $edit_auto['id'] === $a['id']) ? 'background: rgba(255, 215, 0, 0.08);' : ''; ?>">
                                     <td style="font-weight: 700; color: var(--text-main);"><?php echo htmlspecialchars($a['modello']); ?></td>
                                     <td><code><?php echo htmlspecialchars($a['targa']); ?></code></td>
-                                    <td><?php echo number_format($a['consumo_medio'], 2, ',', '.'); ?> km/l</td>
+                                    <td class="col-hide-mobile"><?php echo number_format($a['consumo_medio'], 2, ',', '.'); ?> km/l</td>
                                     <td style="font-weight: 600;">
                                         <?php echo $a['nome_completo'] ? htmlspecialchars($a['nome_completo']) : '<span style="color:var(--text-muted); font-style:italic;">Nessuno</span>'; ?>
                                     </td>
-                                    <td>
+                                    <td class="col-hide-mobile">
                                         <?php if ($a['documenti']): ?>
                                             <a href="<?php echo htmlspecialchars($a['documenti']); ?>" target="_blank" class="btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; border-radius: 6px; display:inline-flex; align-items:center; gap:0.3rem;">
                                                 <i data-lucide="file-text" style="width:12px; height:12px;"></i> Apri

@@ -1107,58 +1107,145 @@ body {
 }
 
 @media (max-width: 600px) {
-    .premium-card {
-        padding: 1.5rem;
+    .app-wrapper,
+    body.app-shell .app-wrapper {
+        padding: 0.75rem;
+    }
+
+    body.app-shell .app-wrapper > header.mpm-header {
+        margin-bottom: 0.75rem;
+    }
+
+    .mpm-header {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        height: 75px !important;
+        padding: 0 0.75rem !important;
+        margin-bottom: 0.75rem !important;
+        border-radius: 14px !important;
+    }
+
+    .mpm-left-group {
+        flex-direction: row !important;
+        gap: 0.5rem !important;
+        text-align: left !important;
+        align-items: center !important;
+    }
+
+    .mpm-logo-container {
+        height: 48px !important;
+        padding: 4px !important;
+    }
+
+    .mpm-title-group {
+        align-items: flex-start !important;
+        gap: 0 !important;
+    }
+
+    .mpm-subtitle-wrap {
+        display: none !important;
+    }
+
+    .mpm-title {
+        font-size: 13px !important;
+        line-height: 1.1 !important;
+    }
+
+    .mpm-title span {
+        display: block !important;
+    }
+
+    .mpm-title .title-highlight {
+        font-size: 15px !important;
+        font-weight: 900 !important;
+    }
+
+    .header-meta {
+        gap: 0.4rem !important;
+        justify-content: flex-end !important;
+    }
+
+    .theme-toggle,
+    .btn-logout {
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 8px !important;
+    }
+
+    .theme-toggle svg,
+    .btn-logout svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    .login-container {
+        margin: 1rem auto;
+        padding: 1.75rem 1.25rem;
         border-radius: 16px;
     }
 
+    .login-title {
+        font-size: 1.4rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .premium-card {
+        padding: 1.25rem 1rem;
+        border-radius: 14px;
+    }
+
     .card-title {
-        font-size: 1.15rem;
-        margin-bottom: 1.4rem;
+        font-size: 1.1rem;
+        margin-bottom: 1.2rem;
     }
 
     .form-group label {
-        font-size: 0.72rem;
+        font-size: 0.7rem;
     }
 
     .form-group input,
     .form-group select,
     .file-upload-wrapper {
-        padding: 0.75rem 0.9rem;
-        font-size: 0.9rem;
+        padding: 0.7rem 0.8rem;
+        font-size: 0.88rem;
     }
 
     .file-upload-wrapper {
-        padding: 1.5rem 1rem;
+        padding: 1.2rem 0.8rem;
     }
 
     .upload-icon {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
     }
 
     .kpi-grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 0.75rem;
     }
 
     .kpi-card {
-        padding: 1.3rem;
-        border-radius: 16px;
+        padding: 1.1rem;
+        border-radius: 14px;
     }
 
     .kpi-card .kpi-value {
-        font-size: 1.8rem;
+        font-size: 1.7rem;
     }
 
     .data-table-container {
-        padding: 1rem;
-        border-radius: 16px;
+        padding: 0.75rem;
+        border-radius: 14px;
     }
 
     .data-table th,
     .data-table td {
-        padding: 0.8rem 0.6rem;
-        font-size: 0.8rem;
+        padding: 0.7rem 0.5rem;
+        font-size: 0.78rem;
     }
 }
 
@@ -1229,4 +1316,11 @@ body.app-shell .app-wrapper > main::-webkit-scrollbar-thumb {
 body.app-shell .app-wrapper > section::-webkit-scrollbar-thumb:hover,
 body.app-shell .app-wrapper > main::-webkit-scrollbar-thumb:hover {
     background: var(--text-muted);
+}
+
+/* Responsive Table Columns */
+@media (max-width: 768px) {
+    .col-hide-mobile {
+        display: none !important;
+    }
 }

@@ -3,6 +3,37 @@
  * Tema scuro, anteprime upload, calcoli live ed eventi modal.
  */
 
+// =========================================
+// MONITORAGGIO SESSIONE (CHIUSURA APP)
+// =========================================
+(function() {
+    const page = window.location.pathname.split('/').pop();
+    
+    // Se siamo in area riservata protetta (agente o admin)
+    if (page === 'agente.php' || page === 'admin.php') {
+        if (!sessionStorage.getItem('mpm_session_active')) {
+            // Se sessionStorage è vuoto, vuol dire che l'applicazione è stata chiusa e riaperta
+            window.location.href = 'logout.php';
+            return;
+        }
+    }
+    
+    // Se siamo sul login, intercettiamo il form per salvare l'attivazione della sessione
+    if (page === 'login.php') {
+        // Rimuoviamo eventuale sessione residua in sessionStorage
+        sessionStorage.removeItem('mpm_session_active');
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function() {
+                    sessionStorage.setItem('mpm_session_active', 'true');
+                });
+            }
+        });
+    }
+})();
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // Inizializza le icone Lucide all'avvio
